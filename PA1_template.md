@@ -1,9 +1,4 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 #Introduction
 
@@ -34,9 +29,31 @@ package [ggplot2][2] for making plotsand plyr, dplyr, tidyr for data wrangling.
 I will also set the option to remove scientific notation from the output and 
 round decimals to 4 spaces.
 
-```{r}
+
+```r
 library(plyr)
 library(dplyr)
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+## 
+## The following objects are masked from 'package:plyr':
+## 
+##     arrange, count, desc, failwith, id, mutate, rename, summarise,
+##     summarize
+## 
+## The following object is masked from 'package:stats':
+## 
+##     filter
+## 
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 library(ggplot2)
 library(scales)
 library(tidyr)
@@ -44,7 +61,8 @@ options(scipen=999)
 ```
 
 Next, I'll load the activity.csv to a data.frame called "data."
-```{r}
+
+```r
 filename <- "activity.csv"
 data <- read.csv(filename, stringsAsFactors = FALSE)
 ```
@@ -55,62 +73,83 @@ the mean, so I used *aggregate()* to sum the **steps** column for each unique **
 
 This is what the data looks like:
 
-```{r}
+
+```r
 stepsDay <- aggregate(steps ~ date, data = data, sum, na.action = na.omit)
 qplot(steps, data=stepsDay, geom="histogram", binwidth = 500)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+
 Now I can calculate the average number of steps per day:
-```{r}
+
+```r
 meanSteps <- mean(stepsDay$steps)
 medianSteps <- median(stepsDay$steps)
 ```
 Which gives me:
 
-**Mean** steps per day: `r meanSteps`
+**Mean** steps per day: 10766.1886792
 
-**Median** steps per day: `r medianSteps`
+**Median** steps per day: 10765
 
 ## What is the average daily activity pattern?
 
 If I want to know the average daily activity pattern I can *aggregate()* the **steps**
 by the time **interval** and draw a linear plot.
-```{r}
+
+```r
 stepsTime <- aggregate(steps ~ interval, data = data, FUN=mean, na.action = na.omit)
 TSplot <- plot(stepsTime$interval, stepsTime$steps, type = "l")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+
 If I want to know the interval with the highest average number of steps I can
 *subset* that out:
 
-```{r}
+
+```r
 highestInterval <- stepsTime[stepsTime$steps == max(stepsTime$steps), ]
 ```
 
 I can clean up the output a bit by reformatting the interval's numeric value to 
 a more familiar time format and putting the number of steps in it's own vector.
 
-```{r}
+
+```r
 maxInterval <- as.POSIXlt(strptime(as.character(paste("0", 
                 highestInterval$interval, sep = "")), format= "%H%M"))
 maxIntTime <- as.character(format(maxInterval, format = "%H:%M"))
 highestIntervalSteps <- highestInterval[1, 2]
 ```
-You can see that the interval with the highest value begins at `r as.character(maxIntTime)`
-with an average of `r format(highestIntervalSteps, digits = 4)` steps.
+You can see that the interval with the highest value begins at 08:35
+with an average of 206.2 steps.
 
 ## Imputing missing values
 
 If you look at the data you can see that there are days with missing values
-```{r}
+
+```r
 head(data)
+```
+
+```
+##   steps       date interval
+## 1    NA 2012-10-01        0
+## 2    NA 2012-10-01        5
+## 3    NA 2012-10-01       10
+## 4    NA 2012-10-01       15
+## 5    NA 2012-10-01       20
+## 6    NA 2012-10-01       25
 ```
 
 In order to evaluate if these *missing values* (**NA**) bias the results of finding the mean
 and median I will replace the **NA** values with the average number of steps for that
 time interval across all of the days.
 
-```{r}
+
+```r
 impute.mean <- function(x) replace(x, is.na(x), mean(x, na.rm = TRUE))
 compl.data <- ddply(data, ~interval, transform, steps = impute.mean(steps))
 compl.data.arr <- arrange(compl.data, date)
@@ -119,23 +158,27 @@ compl.data.arr <- arrange(compl.data, date)
 Now that I've filled in the *missing values* lets see what the total number of 
 steps per day looks like:
 
-```{r}
+
+```r
 stepsDayComp <- aggregate(steps ~ date, data = compl.data.arr, sum, na.action = na.omit)
 qplot(steps, data=stepsDayComp, geom="histogram", binwidth = 500)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png) 
+
 Now let's compare the new **mean** and **median** steps per day with the same calculations
 from the data with the *missing values*
 
-```{r}
+
+```r
 meanStepsComp <- mean(stepsDayComp$steps)
 medianStepsComp <- median(stepsDayComp$steps)
 ```
 
-Here are the means: **missing values** - `r meanSteps` **no missing values** - `r meanStepsComp`
+Here are the means: **missing values** - 10766.1886792 **no missing values** - 10766.1886792
 You can see that substituting the mean value in for the missing values has no effect
 
-Here are the medians: **missing values** - `r medianSteps` **no missing values** - `r medianStepsComp`
+Here are the medians: **missing values** - 10765 **no missing values** - 10766.1886792
 You can see that substituting the mean value in for the missing values has a small effect on the median.  Intersting... 
 
 ## Are there differences in activity patterns between weekdays and weekends?
@@ -144,7 +187,8 @@ Lets take a look at the activity pattern again.  I wonder if there is a differen
 the test subject's activity during weekdays vs. weekends.  
 
 Let's subset the data:
-```{r}
+
+```r
 data$date <- as.Date(data$date)
 data.wd <- mutate(data, day = weekdays(date))
 days <- unique(data.wd$day)
@@ -154,17 +198,21 @@ data.wd[!(data.wd$day %in% days[1:5]), "wd"] <- "weekend"
 
 Now we can aggregate the data labelled with the weekdays and weekends to 
 calculate the mean
-```{r}
+
+```r
 stepsWD <- aggregate(steps ~ interval + wd, data = data.wd, FUN=mean, na.action = na.omit)
 ```
 
 
 
 Let's take a look at those aggregations plotted:
-```{r}
+
+```r
 p <- ggplot(stepsWD, aes(interval,steps))+ geom_line() + facet_grid(wd ~ .)
 p
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-14-1.png) 
 
 The subject seems to start activity a little later in the day and be more active 
 throughout the day with a smaller spike of activity in the morning.
