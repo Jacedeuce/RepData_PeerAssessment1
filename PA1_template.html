@@ -81,23 +81,8 @@ img {
 <h2>Loading and preprocessing the data</h2>
 <p>First, I want to load the package <a href="https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip">dplyr</a> for data wrangling and the package <a href="http://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html">ggplot2</a> for making plotsand plyr, dplyr, tidyr for data wrangling. I will also set the option to remove scientific notation from the output and round decimals to 4 spaces.</p>
 <pre class="r"><code>library(plyr)
-library(dplyr)</code></pre>
-<pre><code>## 
-## Attaching package: 'dplyr'
-## 
-## The following objects are masked from 'package:plyr':
-## 
-##     arrange, count, desc, failwith, id, mutate, rename, summarise,
-##     summarize
-## 
-## The following object is masked from 'package:stats':
-## 
-##     filter
-## 
-## The following objects are masked from 'package:base':
-## 
-##     intersect, setdiff, setequal, union</code></pre>
-<pre class="r"><code>library(ggplot2)
+library(dplyr)
+library(ggplot2)
 library(scales)
 library(tidyr)
 options(scipen=999)</code></pre>

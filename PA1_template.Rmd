@@ -34,7 +34,7 @@ package [ggplot2][2] for making plotsand plyr, dplyr, tidyr for data wrangling.
 I will also set the option to remove scientific notation from the output and 
 round decimals to 4 spaces.
 
-```{r}
+```{r message=FALSE}
 library(plyr)
 library(dplyr)
 library(ggplot2)
